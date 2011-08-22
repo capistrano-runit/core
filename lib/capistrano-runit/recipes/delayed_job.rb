@@ -1,5 +1,5 @@
 Capistrano::Configuration.instance(true).load do
-  _cset :runit_delayed_job_service_name, "unicorn"
+  _cset :runit_delayed_job_service_name, "delayed_job"
   _cset :runit_delayed_job_template, File.expand_path(File.join(File.dirname(__FILE__), "../templates/run-delayed_job.erb"))
   _cset :runit_delayed_job_command, "./script/delayed_job"
 
