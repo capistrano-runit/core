@@ -8,7 +8,7 @@
 
 ADDR=<%= runit_unicorn_listen_current %>
 PORT=<%= runit_unicorn_port_current %>
-APP_DIR="<%= latest_release %>"
+APP_DIR="<%= current_path %>"
 THIS_DIR=$(pwd)
 CUR_PID_FILE=$APP_DIR/tmp/pids/unicorn.pid
 OLD_PID_FILE=$CUR_PID_FILE.oldbin
