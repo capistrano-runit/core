@@ -42,6 +42,9 @@ if GC.respond_to?(:copy_on_write_friendly=)
   GC.copy_on_write_friendly = true
 end
 
+before_exec do |server|
+  ENV["BUNDLE_GEMFILE"] = "$APP_DIR/Gemfile" if File.exists?("$APP_DIR/Gemfile")
+end
 
 before_fork do |server, worker|
   # the following is highly recomended for Rails + "preload_app true"

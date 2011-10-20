@@ -49,9 +49,24 @@ Capistrano::Configuration.instance(true).load do
         run "[ ! -h #{runit_dir}/enabled/#{runit_unicorn_service_name} ] || sv stop #{runit_dir}/enabled/#{runit_unicorn_service_name}/ && rm -f #{runit_dir}/enabled/#{runit_unicorn_service_name}"
       end
 
+      desc "Start Unicorn runit-service"
+      task :start, :roles => :app do
+        run "[ ! -h #{runit_dir}/enabled/#{runit_unicorn_service_name} ] || sv start #{runit_dir}/enabled/#{runit_unicorn_service_name}/"
+      end
+
+      desc "Stop Unicorn runit-service"
+      task :stop, :roles => :app do
+        run "[ ! -h #{runit_dir}/enabled/#{runit_unicorn_service_name} ] || sv stop #{runit_dir}/enabled/#{runit_unicorn_service_name}/"
+      end
+
       desc "Restart Unicorn runit-service"
       task :restart, :roles => :app do
         run "[ ! -h #{runit_dir}/enabled/#{runit_unicorn_service_name} ] || sv restart #{runit_dir}/enabled/#{runit_unicorn_service_name}/"
+      end
+
+      desc "Zerodown restart Unicorn runit-service"
+      task :zerodown_restart, :roles => :app do
+        run "[ ! -h #{runit_dir}/enabled/#{runit_unicorn_service_name} ] || sv hup #{runit_dir}/enabled/#{runit_unicorn_service_name}/"
       end
     end
   end
