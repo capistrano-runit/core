@@ -28,6 +28,16 @@ Capistrano::Configuration.instance(true).load do
         run "[ ! -h #{runit_dir}/enabled/#{runit_resque_service_name} ] || sv stop #{runit_dir}/enabled/#{runit_resque_service_name}/ && rm -f #{runit_dir}/enabled/#{runit_resque_service_name}"
       end
 
+      desc "Start resque runit-service"
+      task :start, :roles => :app do
+        run "[ ! -h #{runit_dir}/enabled/#{runit_resque_service_name} ] || sv start #{runit_dir}/enabled/#{runit_resque_service_name}/"
+      end
+
+      desc "Stop resque runit-service"
+      task :stop, :roles => :app do
+        run "[ ! -h #{runit_dir}/enabled/#{runit_resque_service_name} ] || sv stop #{runit_dir}/enabled/#{runit_resque_service_name}/"
+      end
+
       desc "Restart resque runit-service"
       task :restart, :roles => :app do
         run "[ ! -h #{runit_dir}/enabled/#{runit_resque_service_name} ] || sv restart #{runit_dir}/enabled/#{runit_resque_service_name}/"

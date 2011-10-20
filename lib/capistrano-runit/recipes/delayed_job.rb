@@ -27,6 +27,16 @@ Capistrano::Configuration.instance(true).load do
         run "[ ! -h #{runit_dir}/enabled/#{runit_delayed_job_service_name} ] || sv stop #{runit_dir}/enabled/#{runit_delayed_job_service_name}/ && rm -f #{runit_dir}/enabled/#{runit_delayed_job_service_name}"
       end
 
+      desc "Start delayed_job runit-service"
+      task :start, :roles => :app do
+        run "[ ! -h #{runit_dir}/enabled/#{runit_delayed_job_service_name} ] || sv start #{runit_dir}/enabled/#{runit_delayed_job_service_name}/"
+      end
+
+      desc "Stop delayed_job runit-service"
+      task :stop, :roles => :app do
+        run "[ ! -h #{runit_dir}/enabled/#{runit_delayed_job_service_name} ] || sv stop #{runit_dir}/enabled/#{runit_delayed_job_service_name}/"
+      end
+
       desc "Restart delayed_job runit-service"
       task :restart, :roles => :app do
         run "[ ! -h #{runit_dir}/enabled/#{runit_delayed_job_service_name} ] || sv restart #{runit_dir}/enabled/#{runit_delayed_job_service_name}/"
