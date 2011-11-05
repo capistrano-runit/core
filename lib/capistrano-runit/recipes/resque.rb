@@ -1,7 +1,7 @@
 Capistrano::Configuration.instance(true).load do
   _cset :runit_resque_service_name, "resque"
   _cset :runit_resque_template, File.expand_path(File.join(File.dirname(__FILE__), "../templates/run-resque.erb"))
-  _cset :runit_resque_environment, defer { { "RAILS_ENV" => fetch(:rails_env) } }
+  _cset :runit_resque_environment, defer { { "RAILS_ENV" => fetch(:rails_env, "production") } }
   _cset :runit_resque_command, defer { "#{rake} environment resque:work" }
   _cset :runit_resque_queue, "*"
 
