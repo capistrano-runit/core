@@ -125,7 +125,7 @@ if [ ! $RUNNING ]; then
     echo "Starting unicorn"
     old=$(pwd)
     cd $APP_DIR
-    <%= fetch(:default_environment, {}).map { |k, v| "#{k}='#{v}'" }.join(" ") %> <%= runit_unicorn_command %> -E production -c $THIS_DIR/unicorn.rb -D
+    <%= fetch(:default_environment, {}).map { |k, v| "#{k}=\"#{v}\"" }.join(" ") %> <%= runit_unicorn_command %> -E production -c $THIS_DIR/unicorn.rb -D
     cd $old
     sleep 2
     CUR_PID=$(cat $CUR_PID_FILE)
