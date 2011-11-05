@@ -1,3 +1,7 @@
+=== 1.1.1 2011-11-05
+
+  * default_environment hash was added in templates (special usefull for rbenv).
+
 === 1.1.0 2011-10-23
 
   * Bugfixes.
