@@ -1,3 +1,7 @@
+=== 1.1.2 2011-11-05
+
+  * Added double quotes for environment variables values.
+
 === 1.1.1 2011-11-05
 
   * default_environment hash was added in templates (special usefull for rbenv).
