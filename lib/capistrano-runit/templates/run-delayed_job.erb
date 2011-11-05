@@ -1,3 +1,3 @@
 #!/bin/bash
 cd <%= current_path %>
-<%= runit_delayed_job_environment.map { |k, v| "#{k}='#{v}'" }.join(" ") %> exec <%= runit_delayed_job_command %> run
+<%= fetch(:default_environment, {}).map { |k, v| "#{k}='#{v}'" }.join(" ") %> <%= runit_delayed_job_environment.map { |k, v| "#{k}='#{v}'" }.join(" ") %> exec <%= runit_delayed_job_command %> run
