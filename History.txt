@@ -1,3 +1,6 @@
+  * Added recipes for thinking-sphinx.
+  * Use rails_env variable instead of hardwired 'production' in run-unicorn.
+
 === 1.1.2 2011-11-05
 
   * Added double quotes for environment variables values.

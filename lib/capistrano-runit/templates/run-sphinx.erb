@@ -1,0 +1,4 @@
+#!/bin/sh
+exec <%= runit_thinking_sphinx_searchd_command %> \
+  --nodetach \
+  --config <%= current_path %>/config/<%= runit_thinking_sphinx_environment %>.sphinx.conf
