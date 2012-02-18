@@ -1,3 +1,4 @@
+  * Fixed: runit:setup should run on servers with db-role too.
   * Added recipes for thinking-sphinx.
   * Use rails_env variable instead of hardwired 'production' in run-unicorn.
 

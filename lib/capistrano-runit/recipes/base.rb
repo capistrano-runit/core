@@ -3,7 +3,7 @@ Capistrano::Configuration.instance(true).load do
 
   namespace :runit do
     desc "Setup runit directories"
-    task :setup, :roles => :app do
+    task :setup, :roles => [:app, :db] do
       run "[ -d #{runit_dir}/.env ] || mkdir -p #{runit_dir}/.env"
       run "echo $HOME > #{runit_dir}/.env/HOME"
       run "[ -d #{runit_dir}/available ] || mkdir -p #{runit_dir}/available"
