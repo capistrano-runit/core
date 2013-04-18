@@ -1,3 +1,5 @@
+=== 1.1.3 2013-04-19
+
   * Added recipes for sidekiq.
   * Fixed: runit:setup should run on servers with db-role too.
   * Added recipes for thinking-sphinx.
