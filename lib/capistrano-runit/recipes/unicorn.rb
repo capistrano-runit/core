@@ -45,7 +45,7 @@ Capistrano::Configuration.instance(true).load do
         run "cd #{runit_dir}/enabled && [ -h ./#{runit_unicorn_service_name} ] || ln -sf ../available/#{runit_unicorn_service_name} ."
       end
 
-      desc "Enable Unicorn runit-service"
+      desc "Disable Unicorn runit-service"
       task :disable, :roles => :app do
         run "[ ! -h #{runit_dir}/enabled/#{runit_unicorn_service_name} ] || sv stop #{runit_dir}/enabled/#{runit_unicorn_service_name}/ && rm -f #{runit_dir}/enabled/#{runit_unicorn_service_name}"
       end
