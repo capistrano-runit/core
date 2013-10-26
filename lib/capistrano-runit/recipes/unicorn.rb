@@ -5,6 +5,7 @@ Capistrano::Configuration.instance(true).load do
   _cset :runit_unicorn_workers, 4
   _cset :runit_unicorn_listen, "127.0.0.1"
   _cset :runit_unicorn_port, 8080
+  _cset :runit_unicorn_before_fork_code, ""
   _cset :runit_unicorn_after_fork_code, ""
 
   namespace :runit do

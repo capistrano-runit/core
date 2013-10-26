@@ -53,6 +53,10 @@ before_fork do |server, worker|
     ::ActiveRecord::Base.connection.disconnect!
   end
 
+  <% unless fetch(:runit_unicorn_before_fork_code, nil).nil? %>
+    <%= runit_unicorn_before_fork_code %>
+  <% end %>
+
   ##
   # When sent a USR2, Unicorn will suffix its pidfile with .oldbin and
   # immediately start loading up a new version of itself (loaded with a new
@@ -74,7 +78,6 @@ before_fork do |server, worker|
     end
   end
 end
-
 
 after_fork do |server, worker|
   ##
