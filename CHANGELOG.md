@@ -1,27 +1,31 @@
-=== 1.1.4 2014-02-06
+## 2.0.0.rc1 (unreleased)
 
-  * Added 'runit_unicorn_before_fork_code' variable for unicorn recipe.
+* Drop Capistrano 2.x support.
 
-=== 1.1.3 2013-04-19
+## 1.1.4 2014-02-06
 
-  * Added recipes for sidekiq.
-  * Fixed: runit:setup should run on servers with db-role too.
-  * Added recipes for thinking-sphinx.
-  * Use rails_env variable instead of hardwired 'production' in run-unicorn.
+* Added 'runit_unicorn_before_fork_code' variable for unicorn recipe.
 
-=== 1.1.2 2011-11-05
+## 1.1.3 2013-04-19
 
-  * Added double quotes for environment variables values.
+* Added recipes for sidekiq.
+* Fixed: runit:setup should run on servers with db-role too.
+* Added recipes for thinking-sphinx.
+* Use rails_env variable instead of hardwired 'production' in run-unicorn.
 
-=== 1.1.1 2011-11-05
+## 1.1.2 2011-11-05
 
-  * default_environment hash was added in templates (special usefull for rbenv).
+* Added double quotes for environment variables values.
 
-=== 1.1.0 2011-10-23
+## 1.1.1 2011-11-05
 
-  * Bugfixes.
-  * Added Resque recipe.
+* default_environment hash was added in templates (special usefull for rbenv).
 
-=== 1.0
+## 1.1.0 2011-10-23
 
-  * Initial release.
+* Bugfixes.
+* Added Resque recipe.
+
+## 1.0
+
+* Initial release.
