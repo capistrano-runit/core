@@ -3,13 +3,13 @@ namespace :runit do
   task :setup do
     on roles(fetch(:runit_roles)) do
       within fetch(:deploy_to) do
-        if test "[ !-d runit ]"
+        if test "[ ! -d runit ]"
           execute :mkdir, "-v", "runit"
         else
           info "Directory 'runit' already exists"
         end
         %w(.env available enabled).each do |subdir|
-          if test "[ !-d runit/#{subdir}"
+          if test "[ ! -d runit/#{subdir}"
             execute :mkdir, "-v", "runit/#{subdir}"
           else
             info "Directory 'runit/#{subdir}' already exists"
