@@ -28,5 +28,5 @@ See documention for each module below.
 
 ## Modules
 
-* [Base tasks](/antage/capistrano-runit/blob/master/lib/capistrano/runit/README.md)
-* [Puma](/antage/capistrano-runit/blob/master/lib/capistrano/puma/README.md)
+* [Base tasks](/lib/capistrano/runit/README.md)
+* [Puma](/lib/capistrano/puma/README.md)
