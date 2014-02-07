@@ -1,5 +1,6 @@
 ## 2.0.0.rc1 (unreleased)
 
+* Add puma module.
 * Drop Capistrano 2.x support.
 
 ## 1.1.4 2014-02-06
