@@ -1,3 +1,0 @@
-#!/bin/bash
-cd <%= current_path %>
-<%= fetch(:default_environment, {}).map { |k, v| "#{k}=\"#{v}\"" }.join(" ") %> <%= runit_sidekiq_environment.map { |k, v| "#{k}=\"#{v}\"" }.join(" ") %> exec <%= runit_sidekiq_command %> -e <%= fetch(:rails_env, "production") %> -g <%= application %> -c <%= fetch(:runit_sidekiq_processes, 4) %> <%= runit_sidekiq_queues.map { |q| "-q #{q}" }.join(" ") %> -L <%= File.join(shared_path, "log", "sidekiq.#{fetch(:rails_env, "production")}.log") %> -P <%= File.join(shared_path, "pids", "sidekiq.pid") %>
