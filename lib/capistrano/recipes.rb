@@ -1,5 +1,0 @@
-require "capistrano-runit/recipes/unicorn"
-require "capistrano-runit/recipes/delayed_job"
-require "capistrano-runit/recipes/resque"
-require "capistrano-runit/recipes/sidekiq"
-require "capistrano-runit/recipes/thinking_sphinx"
