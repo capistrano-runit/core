@@ -33,7 +33,7 @@ namespace :runit do
         if test "[ ! -d #{shared_path}/tmp/puma ]"
           execute :mkdir, "-v", "#{shared_path}/tmp/puma"
         end
-        template_path = fetch(:runit_puma_template)
+        template_path = fetch(:runit_puma_run_template)
         if !template_path.nil? && File.exist?(template_path)
           template = ERB.new(File.read(template_path))
           stream = StringIO.new(template.result(binding))
