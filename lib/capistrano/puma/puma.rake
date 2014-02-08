@@ -40,7 +40,7 @@ namespace :runit do
           upload! stream, "runit/available/puma/run"
           execute :chmod, "0755", "runit/available/puma/run"
         else
-          error "Template from 'runit_puma_template' variable isn't found: #{template_path}"
+          error "Template from 'runit_puma_run_template' variable isn't found: #{template_path}"
         end
       end
     end
