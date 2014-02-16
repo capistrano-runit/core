@@ -1,5 +1,6 @@
 ## 2.0.0.rc1 (unreleased)
 
+* Add sidekiq module.
 * Add puma module.
 * Drop Capistrano 2.x support.
 
