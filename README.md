@@ -12,8 +12,8 @@ capistrano 2.x support is moved in `capistrano-2.x` branch.
 Add to `Gemfile`:
 ```
 group :development do
-    gem "capistrano", "~> 3.1"
-    gem "capistrano-runit", "~> 2.0"
+  gem "capistrano", "~> 3.1"
+  gem "capistrano-runit", "~> 2.0"
 end
 ```
 
