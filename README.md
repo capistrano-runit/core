@@ -30,3 +30,4 @@ See documention for each module below.
 
 * [Base tasks](/lib/capistrano/runit/README.md)
 * [Puma](/lib/capistrano/puma/README.md)
+* [Sidekiq](/lib/capistrano/sidekiq/README.md)
