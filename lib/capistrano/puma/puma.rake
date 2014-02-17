@@ -27,8 +27,8 @@ namespace :runit do
       end
 
       on roles(:app) do |host|
-        if test "[ ! -d runit/available/puma ]"
-          execute :mkdir, "-v", "runit/available/puma"
+        if test "[ ! -d #{deploy_to}/runit/available/puma ]"
+          execute :mkdir, "-v", "#{deploy_to}/runit/available/puma"
         end
         if test "[ ! -d #{shared_path}/tmp/puma ]"
           execute :mkdir, "-v", "#{shared_path}/tmp/puma"
@@ -37,8 +37,8 @@ namespace :runit do
         if !template_path.nil? && File.exist?(template_path)
           template = ERB.new(File.read(template_path))
           stream = StringIO.new(template.result(binding))
-          upload! stream, "runit/available/puma/run"
-          execute :chmod, "0755", "runit/available/puma/run"
+          upload! stream, "#{deploy_to}/runit/available/puma/run"
+          execute :chmod, "0755", "#{deploy_to}/runit/available/puma/run"
         else
           error "Template from 'runit_puma_run_template' variable isn't found: #{template_path}"
         end
@@ -48,7 +48,7 @@ namespace :runit do
     desc "Enable puma runit service"
     task :enable do
       on roles(:app) do |host|
-        if test "[ -d runit/available/puma ]"
+        if test "[ -d #{deploy_to}/runit/available/puma ]"
           within "runit/enabled" do
             execute :ln, "-sf", "../available/puma", "puma"
           end
@@ -62,8 +62,8 @@ namespace :runit do
     task :disable do
       invoke "runit:puma:stop"
       on roles(:app) do
-        if test "[ -d runit/enabled/puma ]"
-          execute :rm, "-f", "runit/enabled/puma"
+        if test "[ -d #{deploy_to}/runit/enabled/puma ]"
+          execute :rm, "-f", "#{deploy_to}/runit/enabled/puma"
         else
           error "Puma runit service isn't enabled."
         end
@@ -73,8 +73,8 @@ namespace :runit do
     desc "Start puma runit service"
     task :start do
       on roles(:app) do
-        if test "[ -d runit/enabled/puma ]"
-          execute :sv, "start", "runit/enabled/puma/"
+        if test "[ -d #{deploy_to}/runit/enabled/puma ]"
+          execute :sv, "start", "#{deploy_to}/runit/enabled/puma/"
         else
           error "Puma runit service isn't enabled."
         end
@@ -84,8 +84,8 @@ namespace :runit do
     desc "Stop puma runit service"
     task :stop do
       on roles(:app) do
-        if test "[ -d runit/enabled/puma ]"
-          execute :sv, "stop", "runit/enabled/puma/"
+        if test "[ -d #{deploy_to}/runit/enabled/puma ]"
+          execute :sv, "stop", "#{deploy_to}/runit/enabled/puma/"
         else
           error "Puma runit service isn't enabled."
         end
@@ -95,8 +95,8 @@ namespace :runit do
     desc "Restart puma runit service"
     task :restart do
       on roles(:app) do
-        if test "[ -d runit/enabled/puma ]"
-          execute :sv, "restart", "runit/enabled/puma/"
+        if test "[ -d #{deploy_to}/runit/enabled/puma ]"
+          execute :sv, "restart", "#{deploy_to}/runit/enabled/puma/"
         else
           error "Puma runit service isn't enabled."
         end
@@ -106,8 +106,8 @@ namespace :runit do
     desc "Run phased restart puma runit service"
     task :phased_restart do
       on roles(:app) do
-        if test "[ -d runit/enabled/puma ]"
-          execute :sv, "1", "runit/enabled/puma/"
+        if test "[ -d #{deploy_to}/runit/enabled/puma ]"
+          execute :sv, "1", "#{deploy_to}/runit/enabled/puma/"
         else
           error "Puma runit service isn't enabled."
         end
