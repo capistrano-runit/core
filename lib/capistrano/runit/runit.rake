@@ -9,7 +9,7 @@ namespace :runit do
           info "Directory 'runit' already exists"
         end
         %w(.env available enabled).each do |subdir|
-          if test "[ ! -d runit/#{subdir}"
+          if test "[ ! -d runit/#{subdir} ]"
             execute :mkdir, "-v", "#{deploy_to}/runit/#{subdir}"
           else
             info "Directory 'runit/#{subdir}' already exists"
