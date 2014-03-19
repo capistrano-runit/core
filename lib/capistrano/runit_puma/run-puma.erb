@@ -16,4 +16,4 @@ bind "<%= fetch(:runit_puma_bind) %>"
 EOF
 
 cd <%= current_path %>
-<%= SSHKit.config.default_env.map { |k, v| "#{k.upcase}=\"#{v}\"" }.join(" ") %> exec <%= SSHKit.config.command_map[:puma] %> -C $THIS_DIR/puma.rb
+<%= SSHKit.config.default_env.map { |k, v| "#{k.upcase}=\"#{v}\"" }.join(" ") %> exec <%= SSHKit.config.command_map[:runit_puma] %> -C $THIS_DIR/puma.rb

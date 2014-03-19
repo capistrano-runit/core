@@ -1,7 +1,7 @@
 require "erb"
 
 namespace :runit do
-  namespace :puma do
+  namespace :runit_puma do
     task :map_bins do
       if Rake::Task.task_defined?("bundler:map_bins")
         fetch(:bundle_bins).push "puma"

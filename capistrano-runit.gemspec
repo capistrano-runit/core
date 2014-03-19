@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split($/)
   s.require_paths = ["lib"]
 
-  s.add_runtime_dependency "capistrano", "~> 3.0"
+  s.add_runtime_dependency "capistrano", "~> 3.1"
   s.add_runtime_dependency "sshkit", "~> 1.3"
 end

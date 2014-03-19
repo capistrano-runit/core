@@ -4,7 +4,7 @@
 
 Add this line in `Capfile`:
 ```
-require "capistrano/puma"
+require "capistrano/runit_puma"
 ```
 
 ## Tasks

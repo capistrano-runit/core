@@ -1,3 +1,0 @@
-#!/bin/sh
-cd <%= current_path %>
-<%= SSHKit.config.default_env.map { |k, v| "#{k.upcase}=\"#{v}\"" }.join(" ") %> exec <%= SSHKit.config.command_map[:sidekiq] %> -e <%= fetch(:rack_env, fetch(:rails_env, "production")) %> -g <%= fetch(:application) %> -c <%= fetch(:runit_sidekiq_processes, 4) %> <%= fetch(:runit_sidekiq_queues, ["default"]).map { |q| "-q #{q}" }.join(" ") %> -L <%= File.join(shared_path, "log", "sidekiq.#{fetch(:rack_env, fetch(:rails_env, "production"))}.log") %> -P <%= File.join(shared_path, "tmp/pids", "sidekiq.pid") %>
