@@ -2,14 +2,17 @@ require "erb"
 
 namespace :load do
   task :defaults do
-    set :runit_sidekiq_run_template,  File.expand_path('../run-sidekiq.erb', __FILE__)
-    set :runit_sidekiq_concurrency,   nil
-    set :runit_sidekiq_pid,           -> { 'tmp/sidekiq.pid' }
-    set :runit_sidekiq_queues,        nil
-    set :runiq_sidekiq_config_path,   nil
+    set :runit_sidekiq_run_template, File.expand_path('../run-sidekiq.erb', __FILE__)
+    set :runit_sidekiq_concurrency, nil
+    set :runit_sidekiq_pid, -> { 'tmp/sidekiq.pid' }
+    set :runit_sidekiq_queues, nil
+    set :runiq_sidekiq_config_path, nil
     set :runit_sidekiq_default_hooks, -> { true }
-    set :runit_sidekiq_role,          -> { :app }
-    set :runit_sidekiqctl_cmd,        ->{  }
+    set :runit_sidekiq_role, -> { :app }
+    set :runit_sidekiqctl_cmd, -> {}
+    # Rbenv and RVM integration
+    set :rbenv_map_bins, fetch(:rbenv_map_bins).to_a.concat(%w{ sidekiq sidekiqctl })
+    set :rvm_map_bins, fetch(:rvm_map_bins).to_a.concat(%w{ sidekiq sidekiqctl })
   end
 end
 
@@ -20,8 +23,13 @@ namespace :deploy do
 end
 
 namespace :runit do
-  namespace :runit_sidekiq do
+  namespace :sidekiq do
     # Helpers
+
+    def path_to_sidekiq_service_dir
+      "#{deploy_to}/runit/enabled/sidekiq/"
+    end
+
     def collect_sidekiq_run_command
       array = []
       collect_default_sidekiq_params(array)
@@ -30,7 +38,7 @@ namespace :runit do
       collect_log_sidekiq_param(array)
       collect_pid_sidekiq_param(array)
       collect_config_sidekiq_param(array)
-      array.join(' ')
+      array.compact.join(' ')
     end
 
     def sidekiq_environment
@@ -39,7 +47,7 @@ namespace :runit do
 
     def collect_default_sidekiq_params(array)
       array << SSHKit.config.default_env.map { |k, v| "#{k.upcase}=\"#{v}\"" }.join('')
-      array << "exec #{SSHKit.config.command_map[:runit_sidekiq]}"
+      array << "exec #{SSHKit.config.command_map[:bundle]} exec sidekiq"
       array << "-e #{sidekiq_environment}"
       array << "-g #{fetch(:application)}"
     end
@@ -88,26 +96,9 @@ namespace :runit do
       after 'deploy:published', 'runit:sidekiq:start'
     end
 
-    task :map_bins do
-      if Rake::Task.task_defined?("bundler:map_bins")
-        fetch(:bundle_bins).push "sidekiq"
-        fetch(:bundle_bins).push "sidekiqctl"
-      end
-      if Rake::Task.task_defined?("rbenv:map_bins")
-        fetch(:rbenv_map_bins).push "sidekiq"
-        fetch(:rbenv_map_bins).push "sidekiqctl"
-      end
-    end
-
-    if Rake::Task.task_defined?("bundler:map_bins")
-      before "bundler:map_bins", "runit:sidekiq:map_bins"
-    end
-    if Rake::Task.task_defined?("rbenv:map_bins")
-      before "rbenv:map_bins", "runit:sidekiq:map_bins"
-    end
-
     desc "Setup sidekiq runit service"
     task :setup do
+      invoke 'runit:setup'
       on roles fetch(:runit_sidekiq_role) do
         if test "[ ! -d #{deploy_to}/runit/available/sidekiq ]"
           execute :mkdir, "-v", "#{deploy_to}/runit/available/sidekiq"
@@ -142,8 +133,8 @@ namespace :runit do
     task :disable do
       invoke "runit:sidekiq:stop"
       on roles fetch(:runit_sidekiq_role) do
-        if test "[ -d #{deploy_to}/runit/enabled/sidekiq ]"
-          execute :rm, "-f", "#{deploy_to}/runit/enabled/sidekiq"
+        if test "[ -d #{path_to_sidekiq_service_dir} ]"
+          execute :rm, "-f", "#{path_to_sidekiq_service_dir}"
         else
           error "Sidekiq runit service isn't enabled."
         end
@@ -153,8 +144,8 @@ namespace :runit do
     desc "Start sidekiq runit service"
     task :start do
       on roles fetch(:runit_sidekiq_role) do
-        if test "[ -d #{deploy_to}/runit/enabled/sidekiq ]"
-          execute :sv, "start", "#{deploy_to}/runit/enabled/sidekiq/"
+        if test "[ -d #{path_to_sidekiq_service_dir} ]"
+          execute "#{fetch(:runit_sv_path)} start #{path_to_sidekiq_service_dir}"
         else
           error "Sidekiq runit service isn't enabled."
         end
@@ -164,10 +155,14 @@ namespace :runit do
     desc "Stop sidekiq runit service"
     task :stop do
       on roles fetch(:runit_sidekiq_role) do
-        if test "[ -d #{deploy_to}/runit/enabled/sidekiq ]"
-          execute :sv, "stop", "#{deploy_to}/runit/enabled/sidekiq/"
+        if test "[ -f #{pid_full_path(fetch(:runit_sidekiq_pid))} ]"
+          if test "[ -d #{path_to_sidekiq_service_dir} ]"
+            execute "#{fetch(:runit_sv_path)} stop #{path_to_sidekiq_service_dir}"
+          else
+            error "Sidekiq runit service isn't enabled."
+          end
         else
-          error "Sidekiq runit service isn't enabled."
+          info "Sidekiq is not running yet"
         end
       end
     end
@@ -175,8 +170,8 @@ namespace :runit do
     desc "Restart sidekiq runit service"
     task :restart do
       on roles fetch(:runit_sidekiq_role) do
-        if test "[ -d #{deploy_to}/runit/enabled/sidekiq ]"
-          execute :sv, "restart", "#{deploy_to}/runit/enabled/sidekiq/"
+        if test "[ -d #{path_to_sidekiq_service_dir} ]"
+          execute "#{fetch(:runit_sv_path)} restart #{path_to_sidekiq_service_dir}"
         else
           error "Sidekiq runit service isn't enabled."
         end

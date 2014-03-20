@@ -1,7 +1,7 @@
 namespace :runit do
   desc "Setup runit directories"
   task :setup do
-    on roles(fetch(:runit_roles)) do
+    on roles fetch(:runit_roles) do
       within fetch(:deploy_to) do
         if test "[ ! -d #{deploy_to}/runit ]"
           execute :mkdir, "-v", "#{deploy_to}/runit"
@@ -25,5 +25,6 @@ end
 namespace :load do
   task :defaults do
     set :runit_roles, fetch(:runit_roles, [:app, :db])
+    set :runit_sv_path, '/sbin/sv'
   end
 end

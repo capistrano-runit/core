@@ -1,0 +1,28 @@
+directory   '<%= current_path %>'
+environment '<%= fetch(:rack_env, fetch(:rails_env, "production")) %>'
+daemonize false
+quiet
+pidfile '<%= fetch(:runit_puma_pid)%>'
+state_path '<%= fetch(:runit_puma_state)%>'
+stdout_redirect '<%= fetch(:runit_puma_access_log)%>', '<%= fetch(:runit_puma_error_log)%>', true
+
+workers <%= fetch(:runit_puma_workers, 1) %>
+threads <%= fetch(:runit_puma_threads_min, 0) %>, <%= fetch(:runit_puma_threads_max, 16) %>
+bind "<%= fetch(:runit_puma_bind) %>"
+
+<% if fetch(:runit_puma_preload_app) %>
+preload_app!
+<% end %>
+
+on_restart do
+  puts 'Refreshing Gemfile'
+  ENV["BUNDLE_GEMFILE"] = "<%= fetch(:bundle_gemfile, "#{current_path}/Gemfile") %>"
+end
+
+on_worker_boot do
+  <% if fetch(:runit_puma_init_active_record) %>
+  ActiveSupport.on_load(:active_record) do
+    ActiveRecord::Base.establish_connection
+  end
+  <% end %>
+end
