@@ -3,6 +3,7 @@ require "erb"
 namespace :load do
   task :defaults do
     set :runit_puma_role, -> { :app }
+    set :runit_puma_default_hooks, -> { true }
     set :runit_puma_run_template, File.expand_path("../run-puma.erb", __FILE__)
     set :runit_puma_workers, 1
     set :runit_puma_threads_min, 0
@@ -76,6 +77,8 @@ namespace :runit do
               info 'puma.rb generated'
             end
           end
+        else
+          error "Puma runit service isn't enabled."
         end
       end
     end
@@ -161,7 +164,9 @@ namespace :runit do
       on roles fetch(:runit_puma_role) do
         if test "[ -d #{path_to_puma_service_dir} ]"
           if test "[ -f #{fetch(:runit_puma_pid)} ]" and test "kill -0 $( cat #{fetch(:runit_puma_pid)} )"
-            execute :bundle, :exec, :pumactl, "-S #{fetch(:runit_puma_state)} restart"
+            within current_path do
+              execute :bundle, :exec, :pumactl, "-S #{fetch(:runit_puma_state)} restart"
+            end
           else
             info "Puma is not running"
             execute "#{fetch(:runit_sv_path)} start #{path_to_puma_service_dir}"
