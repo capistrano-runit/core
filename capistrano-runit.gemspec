@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "capistrano-runit"
-  s.version     = "2.0.0.rc1"
+  s.version     = "2.0.0.rc2"
   s.summary     = "Capistrano recipes to manage runit services"
   s.homepage    = "https://github.com/antage/capistrano-runit"
   s.author      = ["Anton Ageev"]

@@ -2,14 +2,14 @@ require "erb"
 
 namespace :load do
   task :defaults do
-    set :runit_sidekiq_run_template, File.expand_path('../run-sidekiq.erb', __FILE__)
-    set :runit_sidekiq_concurrency, nil
-    set :runit_sidekiq_pid, -> { 'tmp/sidekiq.pid' }
-    set :runit_sidekiq_queues, nil
-    set :runiq_sidekiq_config_path, nil
+    set :runit_sidekiq_run_template,  File.expand_path('../../templates/run-sidekiq.erb', __FILE__)
+    set :runit_sidekiq_concurrency,   nil
+    set :runit_sidekiq_pid,           -> { 'tmp/sidekiq.pid' }
+    set :runit_sidekiq_queues,        nil
+    set :runiq_sidekiq_config_path,   nil
     set :runit_sidekiq_default_hooks, -> { true }
-    set :runit_sidekiq_role, -> { :app }
-    set :runit_sidekiqctl_cmd, -> {}
+    set :runit_sidekiq_role,          -> { :app }
+    set :runit_sidekiqctl_cmd,        -> {}
     # Rbenv and RVM integration
     set :rbenv_map_bins, fetch(:rbenv_map_bins).to_a.concat(%w{ sidekiq sidekiqctl })
     set :rvm_map_bins, fetch(:rvm_map_bins).to_a.concat(%w{ sidekiq sidekiqctl })
@@ -90,10 +90,19 @@ namespace :runit do
     end
 
     task :add_default_hooks do
-      after 'deploy:starting', 'runit:sidekiq:quiet'
-      after 'deploy:updated', 'runit:sidekiq:stop'
-      after 'deploy:reverted', 'runit:sidekiq:stop'
+      after 'deploy:check',     'runit:sidekiq:check'
+      after 'deploy:starting',  'runit:sidekiq:quiet'
+      after 'deploy:updated',   'runit:sidekiq:stop'
+      after 'deploy:reverted',  'runit:sidekiq:stop'
       after 'deploy:published', 'runit:sidekiq:start'
+    end
+
+    task :check do
+      if fetch(:runit_sidekiq_default_hooks)
+        invoke 'runit:setup'
+        invoke 'runit:sidekiq:setup'
+        invoke 'runit:sidekiq:enable'
+      end
     end
 
     desc "Setup sidekiq runit service"
