@@ -129,8 +129,12 @@ namespace :runit do
     task :enable do
       on roles fetch(:runit_sidekiq_role) do
         if test "[ -d #{deploy_to}/runit/available/sidekiq ]"
-          within "#{deploy_to}/runit/enabled" do
-            execute :ln, "-sf", "../available/sidekiq", "sidekiq"
+          if test "[ -d #{deploy_to}/runit/enabled/sidekiq ]"
+            info "sidekiq runit service already enabled"
+          else
+            within "#{deploy_to}/runit/enabled" do
+              execute :ln, "-sf", "../available/sidekiq", "sidekiq"
+            end
           end
         else
           error "Sidekiq runit service isn't found. You should run runit:sidekiq:setup."

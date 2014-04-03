@@ -121,8 +121,12 @@ namespace :runit do
     task :enable do
       on roles fetch(:runit_puma_role) do
         if test "[ -d #{deploy_to}/runit/available/puma ]"
-          within "#{deploy_to}/runit/enabled" do
-            execute :ln, "-sf", "../available/puma", "puma"
+          if test "[ -d #{deploy_to}/runit/enabled/puma ]"
+            info 'puma runit service already enabled'
+          else
+            within "#{deploy_to}/runit/enabled" do
+              execute :ln, "-sf", "../available/puma", "puma"
+            end
           end
         else
           error "Puma runit service isn't found. You should run runit:puma:setup."
