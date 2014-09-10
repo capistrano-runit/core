@@ -1,4 +1,4 @@
-require "erb"
+require 'erb'
 
 namespace :load do
   task :defaults do
@@ -11,8 +11,8 @@ namespace :load do
     set :runit_sidekiq_role,          -> { :app }
     set :runit_sidekiqctl_cmd,        -> {}
     # Rbenv and RVM integration
-    set :rbenv_map_bins, fetch(:rbenv_map_bins).to_a.concat(%w{ sidekiq sidekiqctl })
-    set :rvm_map_bins, fetch(:rvm_map_bins).to_a.concat(%w{ sidekiq sidekiqctl })
+    set :rbenv_map_bins, fetch(:rbenv_map_bins).to_a.concat(%w(sidekiq sidekiqctl))
+    set :rvm_map_bins, fetch(:rvm_map_bins).to_a.concat(%w(sidekiq sidekiqctl))
   end
 end
 
@@ -74,7 +74,7 @@ namespace :runit do
     end
 
     def collect_log_sidekiq_param(array)
-      array << "-L #{File.join(current_path, "log", "sidekiq.#{sidekiq_environment}.log")}"
+      array << "-L #{File.join(current_path, 'log', "sidekiq.#{sidekiq_environment}.log")}"
     end
 
     def collect_pid_sidekiq_param(array)
@@ -82,7 +82,7 @@ namespace :runit do
     end
 
     def pid_full_path(pid_path)
-      if pid_path.start_with?("/")
+      if pid_path.start_with?('/')
         pid_path
       else
         "#{current_path}/#{pid_path}"
@@ -105,12 +105,12 @@ namespace :runit do
       end
     end
 
-    desc "Setup sidekiq runit service"
+    desc 'Setup sidekiq runit service'
     task :setup do
       invoke 'runit:setup'
       on roles fetch(:runit_sidekiq_role) do
         if test "[ ! -d #{deploy_to}/runit/available/sidekiq ]"
-          execute :mkdir, "-v", "#{deploy_to}/runit/available/sidekiq"
+          execute :mkdir, '-v', "#{deploy_to}/runit/available/sidekiq"
         end
         template_path = fetch(:runit_sidekiq_run_template)
         if !template_path.nil? && File.exist?(template_path)
@@ -118,22 +118,22 @@ namespace :runit do
           template = ERB.new(File.read(template_path))
           stream = StringIO.new(template.result(binding))
           upload! stream, "#{deploy_to}/runit/available/sidekiq/run"
-          execute :chmod, "0755", "#{deploy_to}/runit/available/sidekiq/run"
+          execute :chmod, '0755', "#{deploy_to}/runit/available/sidekiq/run"
         else
           error "Template from 'runit_sidekiq_run_template' variable isn't found: #{template_path}"
         end
       end
     end
 
-    desc "Enable sidekiq runit service"
+    desc 'Enable sidekiq runit service'
     task :enable do
       on roles fetch(:runit_sidekiq_role) do
         if test "[ -d #{deploy_to}/runit/available/sidekiq ]"
           if test "[ -d #{deploy_to}/runit/enabled/sidekiq ]"
-            info "sidekiq runit service already enabled"
+            info 'sidekiq runit service already enabled'
           else
             within "#{deploy_to}/runit/enabled" do
-              execute :ln, "-sf", "../available/sidekiq", "sidekiq"
+              execute :ln, '-sf', '../available/sidekiq', 'sidekiq'
             end
           end
         else
@@ -142,19 +142,19 @@ namespace :runit do
       end
     end
 
-    desc "Disable sidekiq runit service"
+    desc 'Disable sidekiq runit service'
     task :disable do
-      invoke "runit:sidekiq:stop"
+      invoke 'runit:sidekiq:stop'
       on roles fetch(:runit_sidekiq_role) do
         if test "[ -d #{path_to_sidekiq_service_dir} ]"
-          execute :rm, "-f", "#{path_to_sidekiq_service_dir}"
+          execute :rm, '-f', "#{path_to_sidekiq_service_dir}"
         else
           error "Sidekiq runit service isn't enabled."
         end
       end
     end
 
-    desc "Start sidekiq runit service"
+    desc 'Start sidekiq runit service'
     task :start do
       on roles fetch(:runit_sidekiq_role) do
         if test "[ -d #{path_to_sidekiq_service_dir} ]"
@@ -165,7 +165,7 @@ namespace :runit do
       end
     end
 
-    desc "Stop sidekiq runit service"
+    desc 'Stop sidekiq runit service'
     task :stop do
       on roles fetch(:runit_sidekiq_role) do
         if test "[ -f #{pid_full_path(fetch(:runit_sidekiq_pid))} ]"
@@ -175,12 +175,12 @@ namespace :runit do
             error "Sidekiq runit service isn't enabled."
           end
         else
-          info "Sidekiq is not running yet"
+          info 'Sidekiq is not running yet'
         end
       end
     end
 
-    desc "Restart sidekiq runit service"
+    desc 'Restart sidekiq runit service'
     task :restart do
       on roles fetch(:runit_sidekiq_role) do
         if test "[ -d #{path_to_sidekiq_service_dir} ]"
@@ -191,7 +191,7 @@ namespace :runit do
       end
     end
 
-    desc "Quiet sidekiq (stop accepting new work)"
+    desc 'Quiet sidekiq (stop accepting new work)'
     task :quiet do
       on roles fetch(:runit_sidekiq_role) do
         if test "[ -f #{pid_full_path(fetch(:runit_sidekiq_pid))} ]"
@@ -207,4 +207,3 @@ namespace :runit do
     end
   end
 end
-
