@@ -178,7 +178,7 @@ namespace :runit do
         if test "[ -d #{path_to_danthes_service_dir} ]"
           if test("[ -f #{fetch(:runit_danthes_pid)} ]") && test("kill -0 $( cat #{fetch(:runit_danthes_pid)} )")
             within current_path do
-              execute :bundle, :exec, :danthesctl, "-S #{fetch(:runit_danthes_state)} phased-restart"
+              execute :bundle, :exec, :pumactl, "-S #{fetch(:runit_danthes_state)} phased-restart"
             end
           else
             info 'Danthes is not running'
