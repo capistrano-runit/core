@@ -11,8 +11,6 @@ workers 1
 threads <%= fetch(:runit_danthes_threads_min, 0) %>, <%= fetch(:runit_danthes_threads_max, 16) %>
 bind "<%= fetch(:runit_danthes_bind) %>"
 
-preload_app!
-
 on_restart do
   puts 'Refreshing Gemfile'
   ENV["BUNDLE_GEMFILE"] = "<%= fetch(:bundle_gemfile, "#{current_path}/Gemfile") %>"
