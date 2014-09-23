@@ -46,7 +46,7 @@ namespace :runit do
     end
 
     def collect_default_sidekiq_params(array)
-      array << SSHKit.config.default_env.map { |k, v| "#{k.upcase}=\"#{v}\"" }.join('')
+      array << SSHKit.config.default_env.map { |k, v| "#{k.upcase}=\"#{v}\"" }.join(' ')
       array << "exec #{SSHKit.config.command_map[:bundle]} exec sidekiq"
       array << "-e #{sidekiq_environment}"
       array << "-g #{fetch(:application)}"

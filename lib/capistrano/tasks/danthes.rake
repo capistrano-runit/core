@@ -47,7 +47,7 @@ namespace :runit do
 
     def collect_danthes_run_command
       array = []
-      array << SSHKit.config.default_env.map { |k, v| "#{k.upcase}=\"#{v}\"" }.join('')
+      array << SSHKit.config.default_env.map { |k, v| "#{k.upcase}=\"#{v}\"" }.join(' ')
       array << "exec #{SSHKit.config.command_map[:bundle]} exec puma"
       danthes_conf_path = if fetch(:runit_danthes_conf_in_repo)
                          "#{release_path}/config/danthes.rb"
