@@ -1,10 +1,11 @@
 require 'erb'
+include ::Capistrano::Runit
 
 namespace :load do
   task :defaults do
     set :runit_puma_role, -> { :app }
     set :runit_puma_default_hooks, -> { true }
-    set :runit_puma_run_template, File.expand_path('../../templates/run-puma.erb', __FILE__)
+    set :runit_puma_run_template, File.expand_path('../../templates/run.erb', __FILE__)
     set :runit_puma_workers, 1
     set :runit_puma_threads_min, 0
     set :runit_puma_threads_max, 16
@@ -33,8 +34,12 @@ end
 namespace :runit do
   namespace :puma do
 
-    def path_to_puma_service_dir
-      "#{deploy_to}/runit/enabled/puma/"
+    def puma_enabled_service_dir
+      enabled_service_dir_for('puma')
+    end
+
+    def puma_service_dir
+      service_dir_for('puma')
     end
 
     def template_puma(from, to)
@@ -53,7 +58,7 @@ namespace :runit do
 
     def collect_puma_run_command
       array = []
-      array << SSHKit.config.default_env.map { |k, v| "#{k.upcase}=\"#{v}\"" }.join(' ')
+      array << env_variables
       array << "exec #{SSHKit.config.command_map[:bundle]} exec puma"
       puma_conf_path = if fetch(:runit_puma_conf_in_repo)
                          "#{release_path}/config/puma.rb"
@@ -81,13 +86,9 @@ namespace :runit do
     end
 
     task :check do
-      if fetch(:runit_puma_default_hooks)
-        invoke 'runit:setup'
-        invoke 'runit:puma:setup'
-        invoke 'runit:puma:enable'
-      end
+      check_service('puma')
       on roles fetch(:runit_puma_role) do
-        if test "[ -d #{path_to_puma_service_dir} ]"
+        if test "[ -d #{puma_enabled_service_dir} ]"
           # Create puma.rb for new deployments if not in repo
           if !fetch(:runit_puma_conf_in_repo) && !test("[ -f #{fetch(:runit_puma_conf)} ]")
             create_puma_default_conf
@@ -100,95 +101,49 @@ namespace :runit do
 
     desc 'Setup puma runit service'
     task :setup do
-      invoke 'runit:setup'
       # requirements
       if fetch(:runit_puma_bind).nil?
         $stderr.puts "You should set 'runit_puma_bind' variable."
         exit 1
       end
-
-      on roles fetch(:runit_puma_role) do
-        if test "[ ! -d #{deploy_to}/runit/available/puma ]"
-          execute :mkdir, '-v', "#{deploy_to}/runit/available/puma"
-        end
-        if test "[ ! -d #{shared_path}/tmp/puma ]"
-          execute :mkdir, '-v', "#{shared_path}/tmp/puma"
-        end
-        template_path = fetch(:runit_puma_run_template)
-        if !template_path.nil? && File.exist?(template_path)
-          runit_puma_command = collect_puma_run_command
-          template           = ERB.new(File.read(template_path))
-          stream             = StringIO.new(template.result(binding))
-          upload! stream, "#{deploy_to}/runit/available/puma/run"
-          execute :chmod, '0755', "#{deploy_to}/runit/available/puma/run"
-        else
-          error "Template from 'runit_puma_run_template' variable isn't found: #{template_path}"
-        end
-      end
+      setup_service('puma', collect_sidekiq_run_command)
     end
 
     desc 'Enable puma runit service'
     task :enable do
-      on roles fetch(:runit_puma_role) do
-        if test "[ -d #{deploy_to}/runit/available/puma ]"
-          if test "[ -d #{deploy_to}/runit/enabled/puma ]"
-            info 'puma runit service already enabled'
-          else
-            within "#{deploy_to}/runit/enabled" do
-              execute :ln, '-sf', '../available/puma', 'puma'
-            end
-          end
-        else
-          error "Puma runit service isn't found. You should run runit:puma:setup."
-        end
-      end
+      enable_service('puma')
     end
 
     desc 'Disable puma runit service'
     task :disable do
-      invoke 'runit:puma:stop'
-      on roles fetch(:runit_puma_role) do
-        if test "[ -d #{path_to_puma_service_dir} ]"
-          execute :rm, '-f', "#{path_to_puma_service_dir}"
-        else
-          error "Puma runit service isn't enabled."
-        end
-      end
+      disable_service('puma')
     end
 
     desc 'Start puma runit service'
     task :start do
-      on roles fetch(:runit_puma_role) do
-        if test "[ -d #{path_to_puma_service_dir} ]"
-          execute "#{fetch(:runit_sv_path)} start #{path_to_puma_service_dir}"
-        else
-          error "Puma runit service isn't enabled."
-        end
-      end
+      start_service('puma')
     end
 
     desc 'Stop puma runit service'
     task :stop do
-      on roles fetch(:runit_puma_role) do
-        if test "[ -d #{path_to_puma_service_dir} ]"
-          execute "#{fetch(:runit_sv_path)} stop #{path_to_puma_service_dir}"
-        else
-          error "Puma runit service isn't enabled."
-        end
-      end
+      stop_service('puma')
     end
 
     desc 'Restart puma runit service'
     task :restart do
       on roles fetch(:runit_puma_role) do
-        if test "[ -d #{path_to_puma_service_dir} ]"
+        if test "[ -d #{puma_enabled_service_dir} ]"
           if test("[ -f #{fetch(:runit_puma_pid)} ]") && test("kill -0 $( cat #{fetch(:runit_puma_pid)} )")
             within current_path do
               execute :bundle, :exec, :pumactl, "-S #{fetch(:runit_puma_state)} restart"
             end
           else
             info 'Puma is not running'
-            execute "#{fetch(:runit_sv_path)} start #{path_to_puma_service_dir}"
+            if test("[ -f #{fetch(:runit_puma_pid)} ]")
+              info 'Removing broken pid file'
+              execute :rm, '-f', fetch(:runit_puma_pid)
+            end
+            execute "#{fetch(:runit_sv_path)} start #{puma_enabled_service_dir}"
           end
         else
           error "Puma runit service isn't enabled."
@@ -198,24 +153,12 @@ namespace :runit do
 
     desc 'Force restart puma runit service'
     task :force_restart do
-      on roles fetch(:runit_puma_role) do
-        if test "[ -d #{path_to_puma_service_dir} ]"
-          execute "#{fetch(:runit_sv_path)} start #{path_to_puma_service_dir}"
-        else
-          error "Puma runit service isn't enabled."
-        end
-      end
+      restart_service('puma')
     end
 
     desc 'Run phased restart puma runit service'
     task :phased_restart do
-      on roles fetch(:runit_puma_role) do
-        if test "[ -d #{path_to_puma_service_dir} ]"
-          execute "#{fetch(:runit_sv_path)} 1 #{path_to_puma_service_dir}"
-        else
-          error "Puma runit service isn't enabled."
-        end
-      end
+      kill_hup_service('puma')
     end
   end
 end
