@@ -1,3 +1,11 @@
+# capistrano-runit-core
+
+## 0.1.0
+
+* Extract all supported services to separate gems
+* Rename gem from capistrano-runit to capistrano-runit-core
+
+# capistrano-runit
 ## 2.0.0.rc1 (unreleased)
 
 * Add sidekiq module.

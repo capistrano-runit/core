@@ -23,12 +23,12 @@ module Capistrano
       if pid_path.start_with?('/')
         pid_path
       else
-        "#{current_path}/#{pid_path}"
+        "#{shared_path}/#{pid_path}"
       end
     end
 
     def check_service(service)
-      if fetch(:runit_sidekiq_default_hooks)
+      if fetch("runit_#{service}_default_hooks")
         ::Rake::Task['runit:setup'].invoke
         ::Rake::Task["runit:#{service}:setup"].invoke
         ::Rake::Task["runit:#{service}:enable"].invoke
@@ -42,7 +42,7 @@ module Capistrano
         if test "[ ! -d #{service_dir} ]"
           execute :mkdir, '-v', service_dir
         end
-        template_path = fetch(template_key)
+        template_path = fetch(template_key, ::File.expand_path('../templates/run.erb', __FILE__))
         if !template_path.nil? && File.exist?(template_path)
           upload_runit_run_file(
             run_command,
