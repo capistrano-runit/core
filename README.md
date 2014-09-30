@@ -31,7 +31,7 @@ Create run shell script `/etc/sv/runsvdir-your_application/run`:
 ```bash
 #!/bin/sh
 exec 2>&1
-exec chpst -udeployer runsvdir /home/deployer/apps/your_application/runit/enabled
+exec chpst -udeployer:deployer -e /home/deployer/apps/your_application/runit/.env runsvdir /home/deployer/apps/your_application/runit/enabled
 ```
 
 In current example expected what you deploying with `deployer` user to the `/home/deployer/apps/your_application` folder.
