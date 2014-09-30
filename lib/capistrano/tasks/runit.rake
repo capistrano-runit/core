@@ -24,7 +24,7 @@ namespace :runit do
   task :hook do
     on roles fetch(:runit_roles, [:app, :db]) do
       with path: "#{fetch(:runit_sv_search_path)}:$PATH" do
-        set :runit_sv_path, capture(:which, :sv)
+        host.set :runit_sv_path, capture(:which, :sv)
       end
     end
   end

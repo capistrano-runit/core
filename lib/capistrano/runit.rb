@@ -117,7 +117,7 @@ module Capistrano
     def runit_execute_command(service, command)
       enabled_service_dir = enabled_service_dir_for(service)
       if test "[ -d #{enabled_service_dir} ]"
-        execute "#{fetch(:runit_sv_path)} #{command} #{enabled_service_dir}"
+        execute "#{host.fetch(:runit_sv_path)} #{command} #{enabled_service_dir}"
       else
         error "'#{service}' runit service isn't enabled."
       end
