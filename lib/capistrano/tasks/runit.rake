@@ -20,11 +20,24 @@ namespace :runit do
       end
     end
   end
+
+  task :hook do
+    on roles fetch(:runit_roles, [:app, :db]) do
+      with path: "#{fetch(:runit_sv_search_path)}:$PATH" do
+        set :runit_sv_path, capture(:which, :sv)
+      end
+    end
+  end
+
+end
+
+Capistrano::DSL.stages.each do |stage|
+  after stage, 'runit:hook'
 end
 
 namespace :load do
   task :defaults do
     set :runit_roles, fetch(:runit_roles, [:app, :db])
-    set :runit_sv_path, '/sbin/sv'
+    set :runit_sv_search_path, '/sbin:/usr/sbin'
   end
 end

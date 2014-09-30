@@ -1,5 +1,9 @@
 # capistrano-runit-core
 
+## 0.1.1 (unreleased)
+
+* Path to runit's sv depend on system.
+
 ## 0.1.0
 
 * Extract all supported services to separate gems

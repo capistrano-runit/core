@@ -75,6 +75,6 @@ require "capistrano/runit"
 ## Variables
 
 * `runit_roles` -- what host roles uses runit to run processes. Default value: `[:app, :db]`.
-* `runit_sv_path` -- Path to the runit sv binary. Default value: `/sbin/sv`
+* `runit_sv_search_path` -- Path of $PATH where we will try to found sv binary. Default value: `/sbin:/usr/sbin`
 
 
