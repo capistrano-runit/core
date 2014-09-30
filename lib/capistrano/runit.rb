@@ -119,7 +119,7 @@ module Capistrano
       if test "[ -d #{enabled_service_dir} ]"
         execute "#{fetch(:runit_sv_path)} #{command} #{enabled_service_dir}"
       else
-        error "'#{service}'' runit service isn't enabled."
+        error "'#{service}' runit service isn't enabled."
       end
     end
   end
