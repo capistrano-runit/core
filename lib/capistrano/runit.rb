@@ -110,7 +110,7 @@ module Capistrano
 
     def kill_hup_service(service)
       on roles fetch("runit_#{service}_role".to_sym) do
-        runit_execute_command(service, '1')
+        runit_execute_command(service, 'hup')
       end
     end
 
