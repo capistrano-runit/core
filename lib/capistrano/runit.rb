@@ -63,9 +63,7 @@ module Capistrano
           if test "[ -d #{enabled_service_dir} ]"
             info "'#{service}' runit service already enabled"
           else
-            within "#{enabled_service_dir}" do
-              execute :ln, '-sf', ::File.join(service, service), service
-            end
+            execute :ln, '-snf', service_dir, enabled_service_dir
           end
         else
           error "'#{service}' runit service isn't found. You should run runit:#{service}:setup first."
