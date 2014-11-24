@@ -27,9 +27,10 @@ module Capistrano
       end
     end
 
-    def check_service(service)
-      if fetch("runit_#{service}_default_hooks")
+    def check_service(service, namespace = nil)
+      if fetch("runit_#{service}_default_hooks".to_sym)
         ::Rake::Task['runit:setup'].invoke
+        service = "#{service}:#{namespace}" if namespace
         ::Rake::Task["runit:#{service}:setup"].invoke
         ::Rake::Task["runit:#{service}:enable"].invoke
       end
