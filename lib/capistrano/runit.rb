@@ -90,13 +90,17 @@ module Capistrano
       end
     end
 
-    def stop_service(service)
-      pid_path = pid_full_path(fetch("runit_#{service}_pid".to_sym))
+    def stop_service(service, pidfile = true)
+      pid_path = pid_full_path(fetch("runit_#{service}_pid".to_sym)) if pidfile
       on roles fetch("runit_#{service}_role".to_sym) do
-        if test "[ -f #{pid_path} ]"
-          runit_execute_command(service, 'stop')
+        if pidfile
+          if test "[ -f #{pid_path} ]"
+            runit_execute_command(service, 'stop')
+          else
+            info "'#{service}' is not running yet"
+          end
         else
-          info "'#{service}' is not running yet"
+          runit_execute_command(service, 'stop')
         end
       end
     end
