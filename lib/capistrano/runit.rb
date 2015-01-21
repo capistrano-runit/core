@@ -27,6 +27,21 @@ module Capistrano
       end
     end
 
+    def service_running?(service)
+      service_dir = enabled_service_dir_for(service)
+      supervise_dir = ::File.join(service_dir, 'supervise')
+      stat_file = ::File.join(supervise_dir, 'stat')
+      if Dir.exist?(supervise_dir)
+        if ::File.exist?(stat_file)
+          ::File.read(stat_file).chomp == 'run'
+        else
+          false
+        end
+      else
+        false
+      end
+    end
+
     def check_service(service, namespace = nil)
       if fetch("runit_#{service}_default_hooks".to_sym)
         ::Rake::Task['runit:setup'].invoke
@@ -94,13 +109,17 @@ module Capistrano
       pid_path = pid_full_path(fetch("runit_#{service}_pid".to_sym)) if pidfile
       on roles fetch("runit_#{service}_role".to_sym) do
         if pidfile
-          if test "[ -f #{pid_path} ]"
+          if test "[ -f #{pid_path} ]" && service_running?(service)
             runit_execute_command(service, 'stop')
           else
             info "'#{service}' is not running yet"
           end
         else
-          runit_execute_command(service, 'stop')
+          if service_running?(service)
+            runit_execute_command(service, 'stop')
+          else
+            info "'#{service}' is not running yet"
+          end
         end
       end
     end
