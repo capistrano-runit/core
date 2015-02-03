@@ -28,15 +28,11 @@ module Capistrano
     end
 
     def service_running?(service)
-      service_dir = enabled_service_dir_for(service)
+      service_dir   = enabled_service_dir_for(service)
       supervise_dir = ::File.join(service_dir, 'supervise')
-      stat_file = ::File.join(supervise_dir, 'stat')
-      if Dir.exist?(supervise_dir)
-        if ::File.exist?(stat_file)
-          ::File.read(stat_file).chomp == 'run'
-        else
-          false
-        end
+      stat_file     = ::File.join(supervise_dir, 'stat')
+      if test("[ -d #{supervise_dir} ]") && test("[ -f #{stat_file} ]")
+        capture(:cat, stat_file).chomp == 'run'
       else
         false
       end
