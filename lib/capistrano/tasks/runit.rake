@@ -22,13 +22,14 @@ namespace :runit do
   end
 
   task :hook do
-    on roles fetch(:runit_roles, [:app, :db]) do
-      with path: "#{fetch(:runit_sv_search_path)}:$PATH" do
-        host.set :runit_sv_path, capture(:which, :sv)
+    roles(fetch(:runit_roles, [:app, :db])).each do |server|
+      on server do
+        with path: "#{fetch(:runit_sv_search_path)}:$PATH" do
+          server.set :runit_sv_path, capture(:which, :sv)
+        end
       end
     end
   end
-
 end
 
 Capistrano::DSL.stages.each do |stage|
