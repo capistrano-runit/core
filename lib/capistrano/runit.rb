@@ -95,24 +95,24 @@ module Capistrano
       end
     end
 
-    def start_service(service)
+    def start_service(service, timeout = nil)
       on roles fetch("runit_#{service}_role".to_sym) do
-        runit_execute_command(service, 'start')
+        runit_execute_command(service, 'start', timeout)
       end
     end
 
-    def stop_service(service, pidfile = true)
+    def stop_service(service, pidfile = true, timeout = nil)
       pid_path = pid_full_path(fetch("runit_#{service}_pid".to_sym)) if pidfile
       on roles fetch("runit_#{service}_role".to_sym) do
         if pidfile
           if test "[ -f #{pid_path} ]" && service_running?(service)
-            runit_execute_command(service, 'stop')
+            runit_execute_command(service, 'stop', timeout)
           else
             info "'#{service}' is not running yet"
           end
         else
           if service_running?(service)
-            runit_execute_command(service, 'stop')
+            runit_execute_command(service, 'stop', timeout)
           else
             info "'#{service}' is not running yet"
           end
@@ -120,9 +120,9 @@ module Capistrano
       end
     end
 
-    def restart_service(service)
+    def restart_service(service, timeout = nil)
       on roles fetch("runit_#{service}_role".to_sym) do
-        runit_execute_command(service, 'restart')
+        runit_execute_command(service, 'restart', timeout)
       end
     end
 
@@ -132,10 +132,15 @@ module Capistrano
       end
     end
 
-    def runit_execute_command(service, command)
+    def runit_execute_command(service, command, timeout = nil)
+      # check timeout type
+      unless timeout.instance_of?(NilClass) || (timeout.is_a?(Integer) && timeout >= 0)
+        raise ArgumentError.new("'timeout' argument in '#runit_execute_command' method must be nil or positive integer.")
+      end
+
       enabled_service_dir = enabled_service_dir_for(service)
       if test "[ -d #{enabled_service_dir} ]"
-        execute "#{host.fetch(:runit_sv_path)} #{command} #{enabled_service_dir}"
+        execute "#{host.fetch(:runit_sv_path)} #{"-w #{timeout}" unless timeout.nil?} #{command} #{enabled_service_dir}"
       else
         error "'#{service}' runit service isn't enabled."
       end
