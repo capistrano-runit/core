@@ -1,3 +1,7 @@
 #!/bin/sh
-cd <%= current_path %>
-<%= _runit_command %>
+if [ -d <%= current_path %> ]; then
+  cd <%= current_path %>
+  <%= _runit_command %>
+else
+  echo "Directory <%= current_path %> is missing. Retrying ..."
+fi
