@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name        = 'capistrano-runit-core'
-  spec.version     = '0.1.0'
+  spec.version     = '0.2.0'
   spec.summary     = 'Capistrano3 core recipe to manage runit services'
   spec.homepage    = 'http://capistrano-runit.github.io'
   spec.author      = ['Oleksandr Simonov', 'Anton Ageev']
